@@ -1,0 +1,17 @@
+{
+  "name": "picture-card",
+  "version": "1.0.0",
+  "description": "Backstone challenge",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "Jonathan Durán",
+  "license": "ISC",
+  "dependencies": {
+    "next": "^9.0.5",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
+  }
+}
