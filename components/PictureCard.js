@@ -1,25 +1,42 @@
 import { useState, useEffect } from 'react';
 
-function PictureCard({ name = '', description = '', images = [], wait = 1000 }) {
-    const [ rotateImages, setRotateImages ] = useState();
+const wait = 1000; 
+const transition = 250;
+
+function PictureCard({ name = '', description = '', images = [],  }) {
+    const [ rotateImages, setRotateImages ] = useState(false);
     const [ imageIndex, setImageIndex ] = useState(0);
-    const [ timeoutId, setTimeoutId ] = useState();
+    const [ imageIndexToShow, setImageIndexToShow ] = useState(0);
+    const [ timeoutId, setTimeoutId ] = useState(null);
+    const [ opacity, setOpacity ] = useState(1);
     
     let nextImageIndex = imageIndex + 1;
     if (nextImageIndex >= images.length) {
         nextImageIndex = 0;
     };
 
+    const setImageWithTransition = () => {
+        setOpacity(0);
+        
+        setTimeout(() => {
+            setImageIndex(nextImageIndex)
+            setOpacity(1);
+        }, transition);
+
+        setTimeout(() => {
+            setImageIndexToShow(nextImageIndex);
+        }, transition * 2);
+    };
+
     useEffect(() => {
         if (rotateImages) {
-            const timeout = setTimeout(() => {
-                setImageIndex(nextImageIndex);
-            }, wait);
+            const timeout = setTimeout(setImageWithTransition, wait);
             setTimeoutId(timeout);
         } else {
             clearTimeout(timeoutId);
+            setTimeoutId(null);
             setImageIndex(0);
-            setTimeoutId();
+            setOpacity(1);
         }
     }, [rotateImages, imageIndex]);
 
@@ -29,8 +46,11 @@ function PictureCard({ name = '', description = '', images = [], wait = 1000 }) 
             onMouseEnter={() => setRotateImages(true)}
             onMouseLeave={() => setRotateImages(false)}
         >
-            { rotateImages && <div className="image next"/> }
-            <div className="image"/>
+            <div className="image next"/>
+            <div style={{ opacity, transition: transition + 'ms' }}>
+                <div className="image"/>
+            </div>
+            { rotateImages && <img src={images[nextImageIndex]} hidden/> }
             <div className="content">
                 <h4>
                     { name }
@@ -43,8 +63,9 @@ function PictureCard({ name = '', description = '', images = [], wait = 1000 }) 
                 .card {
                     border-radius: 4px;
                     box-shadow: 0px 2px 4px #0004;
-                    transition: 200ms;
+                    transition: ${transition}ms;
                     background: white;
+                    max-width: 300px;
                 }
                 .card:hover {
                     cursor: pointer;
@@ -59,7 +80,7 @@ function PictureCard({ name = '', description = '', images = [], wait = 1000 }) 
                 }
                 .next {
                     margin-bottom: -200px;
-                    background-image: url(${images[nextImageIndex]});
+                    background-image: url(${images[imageIndexToShow]});
                 }
                 .content {
                     padding: 1em;
